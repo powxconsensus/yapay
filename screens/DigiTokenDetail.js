@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
-import { config } from "../Utils/constants";
+import { config, tokens } from "../Utils/constants";
 import { useWallet } from "../Utils/context";
 import ERC20ABI from "../Abi/erc20.json";
 // Import the crypto getRandomValues shim (**BEFORE** the shims)
@@ -25,6 +25,7 @@ import { ethers } from "ethers";
 import AllowanceModal from "../components/AllowanceModal";
 import { apiFetcher } from "../Utils/fetch";
 import {
+  convertNumber,
   convertTimestampToDateTime,
   convertfloat,
   get_evm_transaction_receipt,
@@ -32,27 +33,102 @@ import {
 import TransferModel from "../components/TransferModel";
 import { truncateString } from "./Account";
 import WithdrawModal from "../components/WithdrawModal";
+import { Picker } from "@react-native-picker/picker";
 
 const DigiTokenDetail = ({ route }) => {
   const { selectedChainId, token, balances } = route.params;
-  
-  const { wallet, tokens, generateWallet, getTokenBalance } = useWallet();
+  console.log("balanceee", selectedChainId, token, balances, amount, chainId);
+  //    const [selectedChainId, setSelectedChainId] = useState(
+  //      Object.keys(tokens)[0]
+  //    );
+  const [chainId, setChainId] = useState(Object.keys(tokens)[0]);
+
+  const { wallet, generateWallet, getTokenBalance,tokenBalance } = useWallet();
   const [recentTx, setRecentTx] = useState();
-  const [amount, setAmount] = useState("1");
 
   const [isWithdrawModalVisible, setWithdrawModalVisible] = useState(false);
 
-  
   console.log("data", token, selectedChainId, amount);
-   const openWithdrawModal  = () => {
-     setWithdrawModalVisible(true);
-   };
+  const openWithdrawModal = () => {
+    setWithdrawModalVisible(true);
+  };
   const closeWithdrawModal = () => {
     setWithdrawModalVisible(false);
   };
 
+  const [amount, setAmount] = useState("0");
+  const [recipientAddress, setRecipientAddress] = useState(wallet.address);
 
-  const handleWithdraw = () => {};
+  const abicoded = new ethers.AbiCoder();
+
+  const getWithdrawData = () => {
+    
+    const data1 = abicoded.encode(
+        [
+          "address",
+          "uint256", //amount
+        ],
+        [recipientAddress, BigInt(Number(amount*(10^tokens[chainId].decimal)))]
+      );
+      
+    console.log("result data ", token, withdraw_tokens);
+
+    const rssdsee = abicoded.encode(
+      [
+        "address", // recipient
+        "string[]", // tokens
+        "string[]", // data
+        "uint256", // amount
+        "uint256", // slippage in 4decimal max, passed value will be divided by 10000
+        "string", // refund_token
+      ],
+      [
+        recipientAddress,
+        [token],
+        [data1],
+        convertNumber(amount), // in dollar [] 10^9
+        "10000000000000000000000", // slippage 10^4
+        wallet.address,
+      ]
+    );
+
+    const transactionData = {
+      transaction: {
+        data: rssdsee,
+        hash: "",
+        chain_id: "11",
+        created_at: Math.floor(Date.now() / 1000),
+        tx_type: `CrosschainTransfer(${chainId})`,
+        from: wallet.address,
+        nonce: "1",
+        signature: {
+          r: "2222",
+          s: "11",
+          v: 1,
+        },
+      },
+    };
+    return transactionData;
+  };
+
+
+  const handleWithdraw = async () => {
+    try {
+      let res;
+      res = await apiFetcher(
+        "dontcare",
+        getWithdrawData(),
+        "broadcast_transaction"
+      );
+      console.log("TransactionResult", res.response);
+      let tx_hash = res.response.data.tx_hash;
+    //   navigation.navigate("Confirm", {
+    //     tx_hash,
+    //   });
+    } catch (error) {
+      console.log("error e -", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -83,7 +159,6 @@ const DigiTokenDetail = ({ route }) => {
           <Text style={styles.value}>{balances[token.id]}</Text>
         </View>
       </View>
-
       <View
         style={{
           flexDirection: "row",
@@ -91,17 +166,54 @@ const DigiTokenDetail = ({ route }) => {
           justifyContent: "space-between",
         }}
       >
+        <Picker
+          selectedValue={chainId}
+          onValueChange={(itemValue) => setChainId(itemValue)}
+          style={styles.picker}
+        >
+          {Object.keys(tokens).map((chainId) => (
+            <Picker.Item
+              key={chainId}
+              label={config[chainId].chainName}
+              value={chainId}
+            />
+          ))}
+        </Picker>
+      </View>
+
+      <View
+        style={{
+          flexDirection: "column",
+          gap: 4,
+          justifyContent: "space-between",
+          flexWrap: "nowrap",
+        }}
+      >
         <TextInput
-          style={styles.textArea}
-          placeholder="00.00"
+          style={[styles.textArea, { width: "100%",fontSize:12 }]}
+          placeholder="0xB....."
           autoCapitalize="none"
           placeholderTextColor="white"
-          onChangeText={(text) => setAmount(text)}
-          value={amount}
+          onChangeText={(text) => setRecipientAddress(text)}
+          value={recipientAddress}
         />
-        <TouchableOpacity style={styles.withdrawButton} onPress={openWithdrawModal}>
-          <Text style={styles.buttonText}>Withdraw</Text>
-        </TouchableOpacity>
+        <View style={{flexDirection:"row",justifyContent:"space-between"}}>
+          <TextInput
+            style={styles.textArea}
+            placeholder="00.00"
+            autoCapitalize="none"
+            placeholderTextColor="white"
+            onChangeText={(text) => setAmount(text)}
+            value={amount}
+          />
+
+          <TouchableOpacity
+            style={styles.withdrawButton}
+            onPress={openWithdrawModal}
+          >
+            <Text style={styles.buttonText}>Withdraw</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <WithdrawModal
@@ -120,6 +232,15 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
     backgroundColor: "#010001",
   },
+  picker: {
+    flex: 1,
+    // marginLeft: 20,
+    marginTop: 20,
+    backgroundColor: "#434343",
+    borderRadius: 10,
+    width: 140,
+    color: "white",
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -129,7 +250,7 @@ const styles = StyleSheet.create({
   textArea: {
     width: "50%",
     textAlign: "center",
-    fontSize: 24,
+    fontSize: 20,
     color: "white",
     marginTop: 30,
     height: 40, // Adjust the height based on your design
