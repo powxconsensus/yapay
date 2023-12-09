@@ -18,6 +18,7 @@ import Transaction from "./screens/Transaction";
 import QrCodeScanner from "./components/QrCodeScanner";
 import Detail from "./screens/Detail";
 import Confirmation from "./components/Confirmation";
+import DigiTokenDetail from "./screens/DigiTokenDetail";
 // import { AnonAadhaarProvider } from "anon-aadhaar-react";
 
 
@@ -74,6 +75,7 @@ export default function App() {
             options={{ headerShown: false }}
           />
           <Stack.Screen name="Detail" component={Detail} />
+          <Stack.Screen name="DigiDetail" component={DigiTokenDetail} />
           <Stack.Screen name="Confirm" component={Confirmation} />
         </Stack.Navigator>
       </WalletProvider>

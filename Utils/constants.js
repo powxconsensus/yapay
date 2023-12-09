@@ -11,14 +11,18 @@ import ABI from "../Abi/abi.json";
 export const config = {
   5: {
     digilocker: "0x799FEb50c1b789caE80Be1A010e1F4D19B749414",
-    rpc: "https://rpc.ankr.com/eth_goerli",
+    rpc: "https://goerli.infura.io/v3/91531d5460e34331a77e37156c61e223",
     chainName: "Goerli",
     LogoURI: "dsfsdfsa.svg",
-    provider: new ethers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli"),
+    provider: new ethers.JsonRpcProvider(
+      "https://goerli.infura.io/v3/91531d5460e34331a77e37156c61e223"
+    ),
     contract: new ethers.Contract(
       "0x799FEb50c1b789caE80Be1A010e1F4D19B749414",
       ABI,
-      new ethers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli")
+      new ethers.JsonRpcProvider(
+        "https://goerli.infura.io/v3/91531d5460e34331a77e37156c61e223"
+      )
     ),
     mainChainId: "1",
     api: "https://api-goerli.etherscan.io/api",
@@ -26,14 +30,16 @@ export const config = {
   },
   80001: {
     digilocker: "0x30511622FED0572d3Ab7afa4d11d7641a9180F00",
-    rpc: "https://rpc.ankr.com/polygon_mumbai",
+    rpc: "https://polygon-mumbai-bor.publicnode.com/",
     chainName: "Polygon Mumbai",
     LogoURI: "dsfsdfsa.svg",
-    provider: new ethers.JsonRpcProvider("https://rpc.ankr.com/polygon_mumbai"),
+    provider: new ethers.JsonRpcProvider(
+      "https://polygon-mumbai-bor.publicnode.com/"
+    ),
     contract: new ethers.Contract(
       "0x30511622FED0572d3Ab7afa4d11d7641a9180F00",
       ABI,
-      new ethers.JsonRpcProvider("https://rpc.ankr.com/polygon_mumbai")
+      new ethers.JsonRpcProvider("https://polygon-mumbai-bor.publicnode.com/")
     ),
     mainChainId: "137",
     api: "https://api-testnet.polygonscan.com/api",

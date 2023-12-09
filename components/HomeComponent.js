@@ -224,35 +224,8 @@ const HomeComponent = (props) => {
         <Text style={[styles.headerText, { fontSize: 20, paddingBottom: 20 }]}>
           Recent Transactions:
         </Text>
-        {/* <ScrollView>
-          {recentTx &&
-            recentTx.map((token, index) => (
-              <View key={index} style={styles.tokenItem}>
-                <View
-                  style={{ flexDirection: "row", gap: 6, alignItems: "center" }}
-                >
-                  <Ionicons name="wallet" size={30} color="#5cb85c" />
-                  <Text style={styles.tokenName}>{token.block_number}</Text>
-                  <Text style={styles.tokenName}>
-                    {truncateString(token.hash, 4)}
-                  </Text>
-                  <Text style={styles.tokenName}>
-                    {(new Date(token.timestamp * 1000)).toLocaleString()}
-                  </Text>
-                  <Text style={styles.tokenName}>
-                    {token.result.Result ? "Success" : "Failed"}
-                  </Text>
-                </View>
-                <Text style={styles.tokenSymbol}>
-                  {typeof token.tx_type == "object"
-                    ? Object.keys(token.tx_type)[0]
-                    : token.tx_type}
-                </Text>
-              </View>
-            ))}
-        </ScrollView> */}
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          {recentTx &&
+          {recentTx && recentTx.length === 0 ? <Text>No trnsaction</Text>: recentTx &&
             recentTx.map((token, index) => (
               <View key={index} style={styles.card}>
                 <View style={styles.cardHeader}>

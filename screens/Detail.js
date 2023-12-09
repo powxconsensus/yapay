@@ -109,7 +109,6 @@ const Detail = ({ route }) => {
   };
 
   const getAllowance = async () => {
-    const signer = wallet.connect(config[selectedChainId].provider);
     const tokenInstance = new ethers.Contract(
       token.address,
       ERC20ABI,

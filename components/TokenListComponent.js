@@ -15,6 +15,7 @@ import { config, tokens } from "../Utils/constants";
 import { ethers } from "ethers";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
+import MyChainTokens from "./MyChainTokens";
 
 
 const TokenListComponent = () => {
@@ -32,7 +33,7 @@ const TokenListComponent = () => {
       const tokenAddress = token.address;
       const balance = await fetchTokenBalance(
         tokenAddress,
-        "0xBde4aF797e5Ed659D057295A7F95cdc0A82aBCA9",
+        wallet.address,
         selectedChainId
       );
 
@@ -136,9 +137,6 @@ const TokenListComponent = () => {
     );
   };
 
-
-  
-
   return (
     <View style={styles.container}>
       <View style={styles.mainContainer}>
@@ -202,6 +200,8 @@ const TokenListComponent = () => {
           </TouchableOpacity>
         ))}
       </View>
+      <MyChainTokens/>
+      
     </View>
   );
 };
