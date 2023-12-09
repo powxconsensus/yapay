@@ -27,6 +27,15 @@ export function convertNumber(number){{
      num = num + "0".repeat(9 - (index + 1));
      return num;
 }}
+export function convertfloat(number,digit) {
+  {
+    let num = number.toString();
+    let index = num.indexOf(".");
+    num = num.replace(".", "");
+    num = num + "0".repeat(digit - (index + 1));
+    return num;
+  }
+}
 
 export function fixedDecimalPlace(number, decimal) {
   return parseFloat(number / (10 ^ decimal));
@@ -47,4 +56,17 @@ export function convertTimestampToDateTime(timestamp) {
   return date.toLocaleString("en-US", options);
 }
 
+
+export function get_evm_transaction_receipt(provider,tx_hash) {
+  return new Promise(async (resolve, reject) => {
+    const intervalId = setInterval(async () => {
+      const res = await provider.getTransactionReceipt(tx_hash);
+      if (res && res.status === 1) {
+        clearInterval(intervalId);
+        // setTransactionReceipt(res.response);
+        resolve(res);
+      }
+    }, 1000);
+  });
+}
 

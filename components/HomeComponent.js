@@ -91,7 +91,7 @@ const HomeComponent = (props) => {
       res = await apiFetcher(
         "dontcare",
         {
-          address: "0x14791697260E4c9A71f18484C9f997B308e59325",
+          address: wallet.address,
         },
         "get_transactions"
       );

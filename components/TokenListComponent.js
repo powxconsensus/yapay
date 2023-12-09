@@ -78,7 +78,6 @@ const TokenListComponent = () => {
           }
         );
         setLoading(false);
-        console.log("Suggested gas fees:", data.data);
         setEstTimeData(data.data);
       } catch (error) {
         console.log("Server responded with:", error);
@@ -86,7 +85,7 @@ const TokenListComponent = () => {
     })();
   }, [selectedChainId]);
 
-
+  
 
   const [selectedTab, setSelectedTab] = useState("low");
 
@@ -111,7 +110,6 @@ const TokenListComponent = () => {
       feeTrendMessage = "💹 Fees are increasing.";
     }
 
-    console.log("Sdasdasddasd",estTimeData,gasType);
     if (!gasData) {
       // Handle the case when gasData is undefined
       return (
@@ -182,7 +180,6 @@ const TokenListComponent = () => {
         {!loader && estTimeData && renderGasInfo(selectedTab, estTimeData)}
       </View>
       <View style={styles.innerContainer}>
-        {/* <Text style={[styles.headerText, { fontSize: 20 }]}>Token Names:</Text> */}
         {selectedTokens.map((token, index) => (
           <TouchableOpacity
             key={index}
@@ -204,9 +201,6 @@ const TokenListComponent = () => {
             <Text style={styles.tokenSymbol}>{balances[token.name]}</Text>
           </TouchableOpacity>
         ))}
-        {/* <TouchableOpacity style={styles.button}>
-          <Text style={{ color: "white" }}>Go to Another Screen</Text>
-        </TouchableOpacity> */}
       </View>
     </View>
   );
@@ -302,6 +296,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#434343",
     borderRadius: 10,
     width: 140,
+    color:"white"
   },
   tokenItem: {
     backgroundColor: "#010001",

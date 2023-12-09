@@ -8,16 +8,10 @@ import {
   StyleSheet,
 } from "react-native";
 
-const AllowanceModal = ({
-  isVisible,
-  closeModal,
-  setAllow,
-  speedAllowance,
-}) => {
+const TransferModel = ({ isVisible, closeModal, handleTransfer }) => {
   const [amount, setAmount] = useState();
   const HandleAllow = () => {
-    setAllow(true);
-    speedAllowance();
+    handleTransfer();
     closeModal();
   };
   return (
@@ -29,7 +23,7 @@ const AllowanceModal = ({
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <Text>Do you really want to continue ? </Text>
+          <Text>Do you really want to Transfer ? </Text>
           <View
             style={{
               flexDirection: "row",
@@ -90,4 +84,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AllowanceModal
+export default TransferModel;

@@ -21,6 +21,8 @@ export const config = {
       new ethers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli")
     ),
     mainChainId: "1",
+    api: "https://api-goerli.etherscan.io/api",
+    apiKey: "FF9TZXKT2JWZ68M2EJH1FGCX13IB7ZKPUZ",
   },
   80001: {
     digilocker: "0x30511622FED0572d3Ab7afa4d11d7641a9180F00",
@@ -34,6 +36,8 @@ export const config = {
       new ethers.JsonRpcProvider("https://rpc.ankr.com/polygon_mumbai")
     ),
     mainChainId: "137",
+    api: "https://api-testnet.polygonscan.com/api",
+    apiKey: "EGX85FSTAE2G688ZNECI6NIC7PWA2GVHW6",
   },
   43113: {
     digilocker: "0x150ecE8554356D4Ed639C60b7E8101c6716889a0",
@@ -47,6 +51,8 @@ export const config = {
       new ethers.JsonRpcProvider("https://rpc.ankr.com/avalanche_fuji")
     ),
     mainChainId: "43114",
+    api: "https://api.routescan.io/v2/network/testnet/evm/43113/etherscan/ap",
+    apiKey: "QAE2JD7XIBCYB6Z6GSKNJIHKZ8XGVYM8AI",
   },
 };
 

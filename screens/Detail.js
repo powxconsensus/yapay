@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity,TextInput, Button } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
+
+import { Ionicons } from "@expo/vector-icons";
 import { config } from "../Utils/constants";
 import { useWallet } from "../Utils/context";
 import ERC20ABI from "../Abi/erc20.json";
 // Import the crypto getRandomValues shim (**BEFORE** the shims)
 import "react-native-get-random-values";
+import  axios  from "axios";
 
 // Import the the ethers shims (**BEFORE** ethers)
 import "@ethersproject/shims";
@@ -13,13 +24,20 @@ import "@ethersproject/shims";
 import { ethers } from "ethers";
 import AllowanceModal from "../components/AllowanceModal";
 import { apiFetcher } from "../Utils/fetch";
+import { convertTimestampToDateTime, convertfloat, get_evm_transaction_receipt } from "../Utils/util";
+import TransferModel from "../components/TransferModel";
+import { truncateString } from "./Account";
 
 const Detail = ({ route }) => {
   const { selectedChainId, token, balances } = route.params;
   const { wallet, generateWallet, getTokenBalance } = useWallet();
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isTransferModalVisible, setTransferModalVisible] = useState(false);
   const [recentTx, setRecentTx] = useState();
-  const [amount,setAmount] = useState(1);
+  const [amount, setAmount] = useState("1");
+  const [reqallowance, setReqAllowance] = useState(BigInt(0));
+  const [allow, setAllow] = useState(false);
+  const [isLoading,setIsLoading] = useState(false);
   const openModal = () => {
     setModalVisible(true);
   };
@@ -27,15 +45,88 @@ const Detail = ({ route }) => {
   const closeModal = () => {
     setModalVisible(false);
   };
-//   const amount = 1;
 
-  
+   const openTransferModel = () => {
+     setTransferModalVisible(true);
+   };
+  const closeTransferModal = () => {
+    setTransferModalVisible(false);
+  };
+  //   const amount = 1;
+  const {tokens} = useWallet();
+  const handleTransfer = async () => {
+    // console.log("wall", i, token, wallet.address);
+     const signer = wallet.connect(config[selectedChainId].provider);
+    const i = await config[selectedChainId].contract
+      .connect(signer)
+      .lock([token.address], [amount], wallet.address);
+      console.log("i",i.hash);
+    const receipt = await get_evm_transaction_receipt(
+      config[selectedChainId].provider,i.hash);
+    console.warn(receipt.hash);
+  };
+
+  const speedAllowance =async () =>{
+    const signer = wallet.connect(config[selectedChainId].provider);
+    const tokenInstance = new ethers.Contract(
+      token.address,
+      ERC20ABI,
+      config[selectedChainId].provider
+    );
+    const allowance = await tokenInstance.allowance(
+      wallet.address,
+      config[selectedChainId].digilocker
+    );
+    
+    const ex = await tokenInstance
+      .connect(signer)
+      .increaseAllowance(config[selectedChainId].digilocker, convertfloat(amount,token.decimal));
+
+      await get_evm_transaction_receipt(
+      config[selectedChainId].provider,
+      ex.hash
+    );
+    setReqAllowance(
+      reqallowance.add(
+        BigInt(convertfloat(amount, token.decimal))
+      )
+    );
+  }
+
+  const getChainTransaction = async () => {
+    setIsLoading(true);
+    try {
+      let res;
+      res = await axios.get(
+        `${config[selectedChainId].api}?module=account&action=tokentx&address=${wallet.address}&contractaddress=${token.address}&apikey=${config[selectedChainId].apikey}`
+      );
+      setRecentTx(res.data.result);
+      setIsLoading(false);
+      return res;
+    } catch (error) {
+      console.log("error e -", error);
+    }
+  };
+
+  const getAllowance = async () => {
+    const signer = wallet.connect(config[selectedChainId].provider);
+    const tokenInstance = new ethers.Contract(
+      token.address,
+      ERC20ABI,
+      config[selectedChainId].provider
+    );
+    const allowance = await tokenInstance.allowance(
+      wallet.address,
+      config[selectedChainId].digilocker
+    );
+    setReqAllowance(allowance);
+  };
+  useEffect(() => {
+    getChainTransaction();
+    getAllowance();
+  }, []);
 
 
-  // const handleWithdraw = () => {
-  //   // Handle the withdraw action here, for example, navigate to a withdraw screen
-  //   navigation.navigate("WithdrawScreen", { selectedChainId, token });
-  // };
   return (
     <View style={styles.container}>
       <View
@@ -48,24 +139,34 @@ const Detail = ({ route }) => {
         <Text style={styles.title}>Token Detail</Text>
 
         <View style={styles.detailsContainer}>
-          <Text style={styles.label}>Token ID:</Text>
-          <Text style={styles.value}>{selectedChainId}</Text>
+          <Text style={styles.label}>Token Address:</Text>
+          <Text style={styles.value}>{truncateString(token.address, 4)}</Text>
         </View>
 
         <View style={styles.detailsContainer}>
           <Text style={styles.label}>Name:</Text>
           <Text style={styles.value}>{token.name}</Text>
         </View>
+        <View style={styles.detailsContainer}>
+          <Text style={styles.label}>Decimal:</Text>
+          <Text style={styles.value}>{token.decimal}</Text>
+        </View>
 
         <View style={styles.detailsContainer}>
-          <Text style={styles.label}>Status:</Text>
+          <Text style={styles.label}>Balance:</Text>
           <Text style={styles.value}>{balances[token.name]}</Text>
         </View>
       </View>
 
       {/* Withdraw button */}
 
-      <View style={{ flexDirection: "row", gap: 4 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          gap: 4,
+          justifyContent: "space-between",
+        }}
+      >
         <TextInput
           style={styles.textArea}
           placeholder="00.00"
@@ -76,56 +177,60 @@ const Detail = ({ route }) => {
         />
         <TouchableOpacity
           style={styles.withdrawButton}
-          onPress={async () => {
-            console.log("wall", i, token, wallet.address);
-            const signer = wallet.connect(config[selectedChainId].provider);
-            const tokenInstance = new ethers.Contract(
-              token.address,
-              ERC20ABI,
-              config[selectedChainId].provider
-            );
-            const allowance = await tokenInstance.allowance(
-              wallet.address,
-              config[selectedChainId].digilocker
-            );
-            console.log("allowance", allowance);
-            if (ethers.toBigInt(allowance) < ethers.toBigInt(amount)) {
-              // openModal();
-              const ex = await tokenInstance
-                .connect(signer)
-                .increaseAllowance(config[selectedChainId].digilocker, amount);
-              console.log("ex", ex);
-            }
-            const i = await config[selectedChainId].contract
-              .connect(signer)
-              .lock([token.address], [amount], wallet.address);
-            console.log("after", i);
-          }}
+          onPress={
+            ethers.toBigInt(reqallowance) < ethers.toBigInt(amount)
+              ? openModal
+              : openTransferModel
+          }
         >
-          <Text style={styles.buttonText}>Transfer</Text>
+          <Text style={styles.buttonText}>
+            {ethers.toBigInt(reqallowance) < ethers.toBigInt(amount)
+              ? "allowance"
+              : "Transfer"}
+          </Text>
         </TouchableOpacity>
       </View>
 
-
-      {/* <Button title="Open Modal" onPress={openModal} /> */}
-      {/* <AllowanceModal isVisible={isModalVisible} closeModal={closeModal} /> */}
+      <AllowanceModal
+        isVisible={isModalVisible}
+        closeModal={closeModal}
+        setAllow={setAllow}
+        speedAllowance={speedAllowance}
+      />
+      <TransferModel
+        isVisible={isTransferModalVisible}
+        closeModal={closeTransferModal}
+        handleTransfer={handleTransfer}
+      />
 
       <View style={styles.innerContainer}>
         <Text style={[styles.headerText, { fontSize: 20 }]}>
           Recent Transactions:
         </Text>
-        {/* {recentTx &&
-          recentTx.map((token, index) => (
-            <View key={index} style={styles.tokenItem}>
-              <View
-                style={{ flexDirection: "row", gap: 6, alignItems: "center" }}
-              >
-                <Ionicons name="wallet" size={30} color="#5cb85c" />
-                <Text style={styles.tokenName}>{token.name}</Text>
+        <ScrollView style={{ height: "auto", width: "100%", color: "white" }}>
+          {isLoading ? (
+            <ActivityIndicator
+              style={styles.loader}
+              size={80}
+              color="#5cb85c"
+            />
+          ) : (
+            recentTx &&
+            recentTx.map((token, index) => (
+              <View key={index} style={styles.tokenItem}>
+                <View
+                  style={{ flexDirection: "row", gap: 6, alignItems: "center" }}
+                >
+                  <Ionicons name="wallet" size={20} color="#5cb85c" />
+                  <Text style={styles.tokenName}>
+                    {convertTimestampToDateTime(token.timeStamp)}
+                  </Text>
+                </View>
+                <Text style={styles.value}>{truncateString(token.hash,2)}</Text>
               </View>
-              <Text style={styles.tokenSymbol}>33</Text>
-            </View>
-          ))} */}
+            ))
+          )}
+        </ScrollView>
       </View>
     </View>
   );
@@ -147,9 +252,14 @@ const styles = StyleSheet.create({
   textArea: {
     width: "50%",
     textAlign: "center",
-    alignItems:"center",
-    justifyContent:"center",
-    fontSize:24,
+    fontSize: 24,
+    color: "white",
+    marginTop:30,
+    height: 40, // Adjust the height based on your design
+    borderWidth: 1,
+    borderColor: "gray",
+    borderRadius: 8,
+    paddingLeft: 10,
   },
   detailsContainer: {
     flexDirection: "row",
@@ -162,15 +272,15 @@ const styles = StyleSheet.create({
     color: "white",
   },
   value: {
-    fontSize: 18,
+    fontSize: 12,
     color: "white",
   },
   withdrawButton: {
     alignItems: "center",
     justifyContent: "center",
-    width: "50%",
-    paddingVertical: 18,
-    paddingHorizontal: 32,
+    width: "40%",
+    paddingVertical: 14,
+    paddingHorizontal: 26,
     borderRadius: 24,
     elevation: 3,
     backgroundColor: "#5cb85c", // Use the same color as in the Login page
@@ -184,10 +294,10 @@ const styles = StyleSheet.create({
   innerContainer: {
     flex: 1,
     // backgroundColor: "#434343",
-    width: "96%",
+    width: "100%",
     borderRadius: 16,
-    paddingVertical: 20,
-    paddingHorizontal: 10,
+    paddingVertical: 0,
+    // paddingHorizontal: 10,
     marginVertical: 30,
   },
   tokenItem: {
@@ -201,7 +311,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   tokenName: {
-    fontSize: 18,
+    fontSize: 14,
     color: "white",
   },
   tokenSymbol: {
