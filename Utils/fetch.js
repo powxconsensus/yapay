@@ -7,16 +7,16 @@ export const apiFetcher = async (
 ) => {
   try {
     const response = await axios.post(
-      "https://f2b7-14-195-9-98.ngrok-free.app",
+      "https://3f0f-14-195-9-98.ngrok-free.app",
       {
         id,
         params,
         method,
       },
       {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        // headers: {
+        //   "Content-Type": "application/json",
+        // },
       }
     );
     // console.log("asdasd",response);

@@ -63,7 +63,6 @@ const HomeComponent = (props) => {
         "get_account"
       );
       setAccountDetail(res.response);
-      console.log("tokenList", res.response);
     } catch (error) {
       console.log("error e -", error);
     }
@@ -115,7 +114,6 @@ const HomeComponent = (props) => {
           { tx_hash: tx_hash },
           "get_transaction"
         );
-        console.log("response", res);
         if (res.response && res.status === 200) {
           clearInterval(intervalId);
           setTransactionReceipt(res.response);

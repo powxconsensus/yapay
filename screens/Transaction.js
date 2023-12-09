@@ -26,7 +26,6 @@ import { ethers } from "ethers";
 import { convertNumber, fixedDecimalPlace } from "../Utils/util";
 
 const MyComponent = ({ data, onValueChange, tokenBalance, tokens }) => {
-  // console.log("data", data);
   data = Object.fromEntries(
     Object.entries(data).filter(([key, value]) => value !== "0")
   );
@@ -179,11 +178,6 @@ const Transaction = ({ route }) => {
   const getOptimalPath = async (selectedTokens, amounts, sendAmount) => {
     try {
       let res;
-      console.log("optimalPath", {
-        selectedTokens,
-        amounts,
-        sendAmount: sendAmount.toString(),
-      });
 
       res = await apiFetcher(
         "dontcare",
@@ -195,7 +189,6 @@ const Transaction = ({ route }) => {
         "get_optimal_path"
       );
       setOptimalPath(res.response);
-      console.log("resultttttt", res);
       setSliderValues(convertDataToObject(res.response));
       return res.response.tokens;
     } catch (error) {

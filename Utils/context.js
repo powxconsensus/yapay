@@ -66,7 +66,6 @@ export const WalletProvider = ({ children }) => {
       let res;
       res = await apiFetcher("dontcare", { from: 0, to: 1000 }, "get_tokens");
       setTokens(res.response.tokens);
-      console.log("tokenListss", res.response.tokens);
       return res.response.tokens;
     } catch (error) {
       console.log("error e -", error);
@@ -89,7 +88,6 @@ export const WalletProvider = ({ children }) => {
         "get_balances"
       );
       setTokenBalance(res.response);
-      console.log("balance", res);
       return res;
     } catch (error) {
       console.log("error e -", error);

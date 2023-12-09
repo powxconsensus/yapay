@@ -20,6 +20,7 @@ export const config = {
       ABI,
       new ethers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli")
     ),
+    mainChainId: "1",
   },
   80001: {
     digilocker: "0x30511622FED0572d3Ab7afa4d11d7641a9180F00",
@@ -32,6 +33,7 @@ export const config = {
       ABI,
       new ethers.JsonRpcProvider("https://rpc.ankr.com/polygon_mumbai")
     ),
+    mainChainId: "137",
   },
   43113: {
     digilocker: "0x150ecE8554356D4Ed639C60b7E8101c6716889a0",
@@ -44,6 +46,7 @@ export const config = {
       ABI,
       new ethers.JsonRpcProvider("https://rpc.ankr.com/avalanche_fuji")
     ),
+    mainChainId: "43114",
   },
 };
 

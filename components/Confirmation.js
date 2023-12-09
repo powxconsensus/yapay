@@ -34,7 +34,6 @@ const Confirmation = ({ route }) => {
           { tx_hash },
           "get_transaction"
         );
-        console.log("response", res);
         if (res.response && res.status === 200) {
           clearInterval(intervalId);
           setTransactionReceipt(res.response.transaction.result);
@@ -70,7 +69,7 @@ const Confirmation = ({ route }) => {
           style={styles.userLogo}
         />
       )}
-      {!loading &&transactionReceipt && transactionReceipt.Result && (
+      {!loading && transactionReceipt && transactionReceipt.Result && (
         <Text style={styles.message}>
           will be redirected to Home in 15 secs
         </Text>

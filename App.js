@@ -1,5 +1,9 @@
 import React from "react";
-import { StyleSheet, Pressable, Text } from "react-native";
+import {
+  StyleSheet,
+  Pressable,
+  Text,
+} from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./screens/HomePage";
@@ -16,11 +20,12 @@ import Detail from "./screens/Detail";
 import Confirmation from "./components/Confirmation";
 // import { AnonAadhaarProvider } from "anon-aadhaar-react";
 
+
 const Stack = createNativeStackNavigator();
 
 function LogoTitle() {
   // return <Ionicons name="map" size={40} color="#bbd4ce" />;
-  return <Text style={{ color: "white", fontSize: 16 }}></Text>;
+  return <Text style={{color: "white",fontSize:16}}></Text>
 }
 
 export default function App() {

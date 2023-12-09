@@ -32,6 +32,19 @@ export function fixedDecimalPlace(number, decimal) {
   return parseFloat(number / (10 ^ decimal));
 }
 
-// export const fixedDecimalPlace = (value, decimalPlace) => {
-//     return (parseFloat(value.toString()));
-// };
+export function convertTimestampToDateTime(timestamp) {
+  const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
+
+  const options = {
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    
+  };
+
+  return date.toLocaleString("en-US", options);
+}
+
+

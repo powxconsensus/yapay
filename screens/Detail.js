@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Button } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity,TextInput, Button } from "react-native";
 import { config } from "../Utils/constants";
 import { useWallet } from "../Utils/context";
 import ERC20ABI from "../Abi/erc20.json";
@@ -19,6 +19,7 @@ const Detail = ({ route }) => {
   const { wallet, generateWallet, getTokenBalance } = useWallet();
   const [isModalVisible, setModalVisible] = useState(false);
   const [recentTx, setRecentTx] = useState();
+  const [amount,setAmount] = useState(1);
   const openModal = () => {
     setModalVisible(true);
   };
@@ -26,7 +27,7 @@ const Detail = ({ route }) => {
   const closeModal = () => {
     setModalVisible(false);
   };
-  const amount = 1;
+//   const amount = 1;
 
   
 
@@ -63,38 +64,51 @@ const Detail = ({ route }) => {
       </View>
 
       {/* Withdraw button */}
-      <TouchableOpacity
-        style={styles.withdrawButton}
-        onPress={async () => {
-          console.log("wall", i, token, wallet.address);
-          const signer = wallet.connect(config[selectedChainId].provider);
-          const tokenInstance = new ethers.Contract(
-            token.address,
-            ERC20ABI,
-            config[selectedChainId].provider
-          );
-          const allowance = await tokenInstance.allowance(
-            wallet.address,
-            config[selectedChainId].digilocker
-          );
-          console.log("allowance", allowance);
-          if (ethers.toBigInt(allowance) < ethers.toBigInt(amount)) {
-            // openModal();
-            const ex = await tokenInstance
+
+      <View style={{ flexDirection: "row", gap: 4 }}>
+        <TextInput
+          style={styles.textArea}
+          placeholder="00.00"
+          autoCapitalize="none"
+          placeholderTextColor="white"
+          onChangeText={(text) => setAmount(Number(text))}
+          value={amount}
+        />
+        <TouchableOpacity
+          style={styles.withdrawButton}
+          onPress={async () => {
+            console.log("wall", i, token, wallet.address);
+            const signer = wallet.connect(config[selectedChainId].provider);
+            const tokenInstance = new ethers.Contract(
+              token.address,
+              ERC20ABI,
+              config[selectedChainId].provider
+            );
+            const allowance = await tokenInstance.allowance(
+              wallet.address,
+              config[selectedChainId].digilocker
+            );
+            console.log("allowance", allowance);
+            if (ethers.toBigInt(allowance) < ethers.toBigInt(amount)) {
+              // openModal();
+              const ex = await tokenInstance
+                .connect(signer)
+                .increaseAllowance(config[selectedChainId].digilocker, amount);
+              console.log("ex", ex);
+            }
+            const i = await config[selectedChainId].contract
               .connect(signer)
-              .increaseAllowance(config[selectedChainId].digilocker, amount);
-            console.log("ex", ex);
-          }
-          const i = await config[selectedChainId].contract
-            .connect(signer)
-            .lock([token.address], [amount], wallet.address);
-          console.log("after", i);
-        }}
-      >
-        <Text style={styles.buttonText}>Transfer</Text>
-      </TouchableOpacity>
-      <Button title="Open Modal" onPress={openModal} />
-      <AllowanceModal isVisible={isModalVisible} closeModal={closeModal} />
+              .lock([token.address], [amount], wallet.address);
+            console.log("after", i);
+          }}
+        >
+          <Text style={styles.buttonText}>Transfer</Text>
+        </TouchableOpacity>
+      </View>
+
+
+      {/* <Button title="Open Modal" onPress={openModal} /> */}
+      {/* <AllowanceModal isVisible={isModalVisible} closeModal={closeModal} /> */}
 
       <View style={styles.innerContainer}>
         <Text style={[styles.headerText, { fontSize: 20 }]}>
@@ -130,6 +144,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: "white",
   },
+  textArea: {
+    width: "50%",
+    textAlign: "center",
+    alignItems:"center",
+    justifyContent:"center",
+    fontSize:24,
+  },
   detailsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -147,7 +168,7 @@ const styles = StyleSheet.create({
   withdrawButton: {
     alignItems: "center",
     justifyContent: "center",
-    width: "100%",
+    width: "50%",
     paddingVertical: 18,
     paddingHorizontal: 32,
     borderRadius: 24,

@@ -18,7 +18,6 @@ const Signup = (props) => {
   const handlePress = () => {
     // Handle signup logic here
     const signerWallet = getSignerFromPrivateKeyOrMnemonic(password);
-    console.log("signerWallets", signerWallet);
     setWallets(signerWallet);
     props.navigation.navigate("Home");
   };
