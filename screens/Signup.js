@@ -35,7 +35,7 @@ const Signup = (props) => {
 
       <TextInput
         style={styles.textInput}
-        placeholder="Enter Mnemonics or Public key"
+        placeholder="Enter Mnemonics or Private key"
         autoCapitalize="none"
         placeholderTextColor="#B6B6B4"
         onChangeText={(text) => setPassword(text)}

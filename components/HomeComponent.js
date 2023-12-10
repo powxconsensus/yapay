@@ -22,6 +22,8 @@ import "@ethersproject/shims";
 import { ethers } from "ethers";
 import { truncateString } from "../screens/Account";
 import { convertTimestampToDateTime } from "../Utils/util";
+import KYCModal from "./KYCModal";
+import { Push } from "./Push";
 
 const HomeComponent = (props) => {
   const { wallet, fetchTokenBalance, getTokensList, getTokenBalance } =
@@ -84,6 +86,15 @@ const HomeComponent = (props) => {
 
   const [transactionReceipt, setTransactionReceipt] = useState(null);
   const [recentTx, setRecentTx] = useState();
+
+  const [isKYCModalVisible, setKYCModalVisible] = useState(false);
+
+  const openKYCModal = () => {
+    setKYCModalVisible(true);
+  };
+  const closeKYCModal = () => {
+    setKYCModalVisible(false);
+  };
 
   const getRecentTxOnChain = async () => {
     try {
@@ -170,6 +181,11 @@ const HomeComponent = (props) => {
     })();
   }, []);
 
+  useEffect(()=>{
+    // Push();
+    console.log("}asdsa",wallet)
+  },[])
+
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
@@ -214,7 +230,7 @@ const HomeComponent = (props) => {
                 borderColor: "#5cb85c",
               },
             ]}
-            onPress={getKYCDone}
+            onPress={openKYCModal}
           >
             <Text style={styles.buttonText}>Get KYC Done</Text>
           </Pressable>
@@ -225,7 +241,10 @@ const HomeComponent = (props) => {
           Recent Transactions:
         </Text>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          {recentTx && recentTx.length === 0 ? <Text>No trnsaction</Text>: recentTx &&
+          {recentTx && recentTx.length === 0 ? (
+            <Text>No trnsaction</Text>
+          ) : (
+            recentTx &&
             recentTx.map((token, index) => (
               <View key={index} style={styles.card}>
                 <View style={styles.cardHeader}>
@@ -258,9 +277,15 @@ const HomeComponent = (props) => {
                   </Text>
                 </View>
               </View>
-            ))}
+            ))
+          )}
         </ScrollView>
       </View>
+      <KYCModal
+        isVisible={isKYCModalVisible}
+        closeModal={closeKYCModal}
+        getKYCDone={getKYCDone}
+      />
     </View>
   );
 };

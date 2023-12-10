@@ -22,8 +22,7 @@ const Login = (props) => {
         />
         <Text style={styles.headerText}>DIGI-PAY</Text>
       </View>
-      <Text style={styles.title}>Login To Continue</Text>
-
+      <Text style={styles.title}>Provide Mnemonics to Continue</Text>
       <TextInput
         style={styles.textInput}
         placeholder="Enter your mnemonic phrase"

@@ -110,7 +110,11 @@ export const WalletProvider = ({ children }) => {
 
 
    const fetchTokenBalance = async (token,wallet,chainId)=>{
-    const provider = new ethers.JsonRpcProvider(config[chainId].rpc);
+    if(token.toLocaleLowerCase() === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE".toLocaleLowerCase() ){
+      const balance = await config[chainId].provider.getBalance(wallet);
+      return balance;
+    }
+    console.log("provider", config[chainId].rpc);
     const instance = new ethers.Contract(
       token,
       [
@@ -133,7 +137,7 @@ export const WalletProvider = ({ children }) => {
           type: "function",
         },
       ],
-      provider
+      config[chainId].provider
     );
     return await instance.balanceOf(wallet);
    }

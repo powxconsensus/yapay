@@ -10,7 +10,7 @@ const QrCodeScanner = ({ route }) => {
         <Text style={styles.receiveButtonText}>Receive</Text>
       <View style={styles.qrCodeContainer}>
         <Text style={styles.scanText}>Scan the code to make Payment</Text>
-        <View style={styles.qrCodeBorder}>
+        {/* <View style={styles.qrCodeBorder}> */}
           <QRCode value={JSON.stringify(accountDetail.account)} size={300} />
           {/* {
     account: {
@@ -31,7 +31,7 @@ const QrCodeScanner = ({ route }) => {
     },
     id: "0",
   } */}
-        </View>
+        {/* </View> */}
       </View>
     </View>
   );

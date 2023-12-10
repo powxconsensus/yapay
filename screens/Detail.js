@@ -214,7 +214,7 @@ const Detail = ({ route }) => {
               color="#5cb85c"
             />
           ) : (
-            recentTx &&
+            recentTx && recentTx.length===0 &&
             recentTx.map((token, index) => (
               <View key={index} style={styles.tokenItem}>
                 <View

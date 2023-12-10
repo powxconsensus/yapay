@@ -37,7 +37,7 @@ import { Picker } from "@react-native-picker/picker";
 
 const DigiTokenDetail = ({ route }) => {
   const { selectedChainId, token, balances } = route.params;
-  console.log("balanceee", selectedChainId, token, balances, amount, chainId);
+//   console.log("balanceee", selectedChainId, token, balances, amount, chainId);
   //    const [selectedChainId, setSelectedChainId] = useState(
   //      Object.keys(tokens)[0]
   //    );
@@ -48,7 +48,7 @@ const DigiTokenDetail = ({ route }) => {
 
   const [isWithdrawModalVisible, setWithdrawModalVisible] = useState(false);
 
-  console.log("data", token, selectedChainId, amount);
+ 
   const openWithdrawModal = () => {
     setWithdrawModalVisible(true);
   };
@@ -60,37 +60,45 @@ const DigiTokenDetail = ({ route }) => {
   const [recipientAddress, setRecipientAddress] = useState(wallet.address);
 
   const abicoded = new ethers.AbiCoder();
-
+   console.log(
+     "data",
+     amount,
+     token.decimal,convertNumber(amount),
+     BigInt(amount) * 10n ** BigInt(token.decimal),
+   );
   const getWithdrawData = () => {
     
     const data1 = abicoded.encode(
-        [
-          "address",
-          "uint256", //amount
-        ],
-        [recipientAddress, BigInt(Number(amount*(10^tokens[chainId].decimal)))]
-      );
+      [
+        "uint256", //amount
+      ],
+      [BigInt(amount) * 10n ** BigInt(token.decimal)]
+    );
       
-    console.log("result data ", token, withdraw_tokens);
+    // console.log(
+    //   "result data ",
+    //   BigInt(Number(amount * (10 ^ tokens[chainId].decimal)))
+    // );
 
     const rssdsee = abicoded.encode(
       [
         "address", // recipient
         "string[]", // tokens
-        "string[]", // data
+        "bytes[]", // data
         "uint256", // amount
         "uint256", // slippage in 4decimal max, passed value will be divided by 10000
         "string", // refund_token
       ],
       [
         recipientAddress,
-        [token],
+        [token.id],
         [data1],
         convertNumber(amount), // in dollar [] 10^9
         "10000000000000000000000", // slippage 10^4
         wallet.address,
       ]
     );
+    console.log("dasdsfdsf",data1)
 
     const transactionData = {
       transaction: {
@@ -115,6 +123,8 @@ const DigiTokenDetail = ({ route }) => {
   const handleWithdraw = async () => {
     try {
       let res;
+      console.log("TransactionResult", "sadasdasd");
+
       res = await apiFetcher(
         "dontcare",
         getWithdrawData(),

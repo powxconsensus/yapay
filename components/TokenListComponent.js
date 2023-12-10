@@ -31,6 +31,7 @@ const TokenListComponent = () => {
     const updatedBalances = {};
     for (const token of tokens[selectedChainId] || []) {
       const tokenAddress = token.address;
+      console.log("balance", tokenAddress, wallet.address, selectedChainId);
       const balance = await fetchTokenBalance(
         tokenAddress,
         wallet.address,
@@ -53,8 +54,25 @@ const TokenListComponent = () => {
     setBalances(updatedBalances);
   };
 
+  const [nativeBalance,setNativeBalance] = useState();
+
+
+
+  // const getBalance = async () =>{
+  //     const balance = await etherprovider.getBalance(
+  //       "0xd9625d22eb6371F9120817B46E278e9803c7d42B"
+  //     );
+  //     console.log("asdsadsadsadasdasdsadasdasdasd",balance);
+  // }
+
   useEffect(() => {
     updateBalances();
+    // (async () => {
+    //   console.log(
+    //     "sdasd",
+    //     await ethers.provider.getBalance(wallet.address)
+    //   );
+    // })();
   }, [selectedChainId]);
 
   const navigation = useNavigation();
@@ -136,7 +154,6 @@ const TokenListComponent = () => {
       </View>
     );
   };
-
   return (
     <View style={styles.container}>
       <View style={styles.mainContainer}>
@@ -178,27 +195,30 @@ const TokenListComponent = () => {
         {!loader && estTimeData && renderGasInfo(selectedTab, estTimeData)}
       </View>
       <View style={styles.innerContainer}>
-        {selectedTokens.map((token, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.tokenItem}
-            onPress={() =>
-              navigation.navigate("Detail", {
-                selectedChainId,
-                token,
-                balances,
-              })
-            }
-          >
-            <View
-              style={{ flexDirection: "row", gap: 6, alignItems: "center" }}
+        {selectedTokens.map((token, index) => {
+          // const balance = await provider.getBalance(address);
+          return (
+            <TouchableOpacity
+              key={index}
+              style={styles.tokenItem}
+              onPress={() =>
+                navigation.navigate("Detail", {
+                  selectedChainId,
+                  token,
+                  balances,
+                })
+              }
             >
-              <Ionicons name="wallet" size={26} color="#5cb85c" />
-              <Text style={styles.tokenName}>{token.name}</Text>
-            </View>
-            <Text style={styles.tokenSymbol}>{balances[token.name]}</Text>
-          </TouchableOpacity>
-        ))}
+              <View
+                style={{ flexDirection: "row", gap: 6, alignItems: "center" }}
+              >
+                <Ionicons name="wallet" size={26} color="#5cb85c" />
+                <Text style={styles.tokenName}>{token.name}</Text>
+                {/* <Text style={styles.tokenName}>{token.name}</Text> */}
+              </View>
+              <Text style={styles.tokenSymbol}>{balances[token.name]}</Text>
+            </TouchableOpacity>
+          );})}
       </View>
       <MyChainTokens/>
       
